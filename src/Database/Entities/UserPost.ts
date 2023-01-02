@@ -1,0 +1,42 @@
+import {
+    BaseEntity,
+    Column, CreateDateColumn,
+    Entity,
+    JoinColumn,
+    JoinTable,
+    ManyToMany,
+    ManyToOne, OneToMany,
+    PrimaryGeneratedColumn
+} from "typeorm";
+import {User} from "./User";
+import {Comment} from "./Comment";
+
+@Entity("userPosts")
+export class UserPost extends BaseEntity{
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column({
+        nullable: false
+    })
+    postTitle: string;
+
+    @Column({
+        nullable: false
+    })
+    postContent: string;
+
+    @ManyToOne(() => User, user => user.posts)
+    @JoinColumn()
+    author: User;
+
+    @ManyToMany(() => User, user => user.likedPosts)
+    @JoinTable()
+    likedBy: User[];
+
+    @OneToMany(() => Comment, comment => comment.post)
+    comments: Comment[];
+
+    @CreateDateColumn()
+    createdAt: Date;
+}
