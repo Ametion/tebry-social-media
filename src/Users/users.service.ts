@@ -83,6 +83,14 @@ export class UsersService {
             return await UsersRepo.findOneOrFail({
                 where: {
                     login: login
+                },
+                relations: {
+                    comments: {
+                        author: true
+                    },
+                    followers: true,
+                    followings: true,
+                    likedPosts: true
                 }
             })
         }catch(e: any){

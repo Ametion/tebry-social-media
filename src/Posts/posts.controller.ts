@@ -1,9 +1,10 @@
-import {Body, Controller, Get, HttpCode, Param, Post, Query, UsePipes, ValidationPipe} from "@nestjs/common";
+import {Body, Controller, Get, HttpCode, Param, Post, UsePipes, ValidationPipe} from "@nestjs/common";
 import {PostsService} from "./posts.service";
 import {PostsDTO} from "./DTO/PostsDTO";
 import {UserPostResponse} from "./Response/UserPostResponse";
 import {ResponseModel} from "../Responses/ResponseModel";
 import {CreatePostDTO} from "./DTO/CreatePostDTO";
+import {LikePostDTO} from "./DTO/LikePostDTO";
 
 @Controller()
 export class PostsController {
@@ -24,5 +25,12 @@ export class PostsController {
     @UsePipes(ValidationPipe)
     public async CreatePost(@Body() createPostDTO: CreatePostDTO): Promise<boolean | ResponseModel> {
         return await this.postsService.CreatePost(createPostDTO);
+    }
+
+    @HttpCode(200)
+    @Post("/likePost")
+    @UsePipes(ValidationPipe)
+    public async LikePost(@Body() likePostDTO: LikePostDTO): Promise<boolean | ResponseModel> {
+        return await this.postsService.LikePost(likePostDTO);
     }
 }

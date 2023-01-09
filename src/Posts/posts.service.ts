@@ -4,10 +4,9 @@ import {ResponseModel} from "../Responses/ResponseModel";
 import {UserPostResponse} from "./Response/UserPostResponse";
 import {PostsRepo} from "../Database/DatabaseRepositories";
 import {UserResponse} from "../Users/Response/UserResponse";
-import {CommentResponse} from "../Comments/Response/CommentResponse";
 import {UsersService} from "../Users/users.service";
 import {CreatePostDTO} from "./DTO/CreatePostDTO";
-
+import {LikePostDTO} from "./DTO/LikePostDTO";
 @Injectable()
 export class PostsService{
     private readonly usersService: UsersService;
@@ -75,4 +74,32 @@ export class PostsService{
             return new ResponseModel(400, "Something went wrong");
         }
     }
+
+    public async LikePost(likePostDTO: LikePostDTO): Promise<boolean | ResponseModel> {
+        try{
+            const user = await this.usersService.GetUserByLogin(likePostDTO.login);
+
+            const post = await PostsRepo.findOneOrFail({
+                where: {
+                    id: likePostDTO.postId
+                }
+            })
+
+            let liked = !!user.likedPosts.find(element => element.id == post.id);
+
+            if (liked) {
+                user.likedPosts = user.likedPosts.filter((v) => {
+                    return post.id != v.id
+                })
+                await user.save();
+                return false;
+            }
+
+            user.likedPosts.push(post);
+            await user.save();
+            return true;
+    }catch(e: any){
+        return new ResponseModel(400, e.toString());
+    }
+}
 }
