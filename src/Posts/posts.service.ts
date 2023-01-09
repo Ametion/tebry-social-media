@@ -33,7 +33,8 @@ export class PostsService{
                     likedBy: true,
                     comments: {
                         author: true
-                    }
+                    },
+                    author: true
                 }
             })
 
@@ -42,7 +43,8 @@ export class PostsService{
                 const comments = []
 
                 p.likedBy.forEach(u => whoLiked.push(new UserResponse(u.id, u.login, u.firstName, u.secondName)));
-                arr.push(new UserPostResponse(p.id, p.postTitle, p.postContent, whoLiked, comments));
+                arr.push(new UserPostResponse(p.id, p.postTitle, p.postContent,
+                new UserResponse(p.author.id, p.author.login, p.author.firstName, p.author.secondName), whoLiked, comments));
             });
 
             return arr;
