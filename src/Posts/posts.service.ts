@@ -7,6 +7,8 @@ import {UserResponse} from "../Users/Response/UserResponse";
 import {UsersService} from "../Users/users.service";
 import {CreatePostDTO} from "./DTO/CreatePostDTO";
 import {LikePostDTO} from "./DTO/LikePostDTO";
+import {UserPost} from "../Database/Entities";
+import {CommentResponse} from "../Comments/Response/CommentResponse";
 @Injectable()
 export class PostsService{
     private readonly usersService: UsersService;
@@ -17,11 +19,15 @@ export class PostsService{
 
     public async GetUserPosts(postsDTO: PostsDTO): Promise<Array<UserPostResponse> | ResponseModel> {
         try{
-            const arr = new Array<UserPostResponse>();
+            if(!await this.usersService.IsUserExist(postsDTO.login)){
+                return new ResponseModel(204, "No user with this login");
+            }
 
             if(!await this.usersService.CheckToken(postsDTO.login, postsDTO.token)){
                return new ResponseModel(400, "Wrong access token");
             }
+
+            const arr = new Array<UserPostResponse>();
 
             const posts = await PostsRepo.find({
                 where: {
@@ -42,21 +48,23 @@ export class PostsService{
                 const whoLiked = []
                 const comments = []
 
-                p.likedBy.forEach(u => whoLiked.push(new UserResponse(u.id, u.login, u.firstName, u.secondName)));
+                p.likedBy.forEach(u => whoLiked.push(new UserResponse(u.id, u.login, u.firstName, u.secondName)))
+                p.comments.forEach(c => comments.push(new CommentResponse(c.id, c.content, "",
+                    new UserResponse(c.author.id, c.author.login, c.author.firstName, c.author.secondName))))
                 arr.push(new UserPostResponse(p.id, p.postTitle, p.postContent,
                 new UserResponse(p.author.id, p.author.login, p.author.firstName, p.author.secondName), whoLiked, comments));
             });
 
             return arr;
         }catch{
-            return new ResponseModel(400, "something went wrong");
+            return new ResponseModel(400, "Something went wrong");
         }
     }
 
     public async CreatePost(createPostDTO: CreatePostDTO): Promise<boolean | ResponseModel> {
         try{
             if(!await this.usersService.IsUserExist(createPostDTO.login)){
-                return false
+                return new ResponseModel(204, "No user with this login");
             }
 
             if(!await this.usersService.CheckToken(createPostDTO.login, createPostDTO.token)){
@@ -79,6 +87,14 @@ export class PostsService{
 
     public async LikePost(likePostDTO: LikePostDTO): Promise<boolean | ResponseModel> {
         try{
+            if(!await this.usersService.IsUserExist(likePostDTO.login)){
+                return new ResponseModel(204, "No user with this login");
+            }
+
+            if(!await this.usersService.CheckToken(likePostDTO.login, likePostDTO.token)){
+                return new ResponseModel(400, "Wrong access token");
+            }
+
             const user = await this.usersService.GetUserByLogin(likePostDTO.login);
 
             const post = await PostsRepo.findOneOrFail({
@@ -87,21 +103,23 @@ export class PostsService{
                 }
             })
 
-            let liked = !!user.likedPosts.find(element => element.id == post.id);
+            let liked = !!user.likedPosts.find(el => el.id == post.id);
 
-            if (liked) {
-                user.likedPosts = user.likedPosts.filter((v) => {
-                    return post.id != v.id
-                })
+            if (!liked) {
+                user.likedPosts.push(post);
                 await user.save();
-                return false;
+                return true;
             }
 
-            user.likedPosts.push(post);
+            user.likedPosts = user.likedPosts.filter((v) => {
+                return post.id != v.id
+            })
+
             await user.save();
-            return true;
-    }catch(e: any){
-        return new ResponseModel(400, e.toString());
+
+            return false;
+        }catch{
+            return new ResponseModel(400, "Something went wrong");
+        }
     }
-}
 }
