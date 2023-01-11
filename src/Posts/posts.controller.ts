@@ -8,7 +8,7 @@ import {LikePostDTO} from "./DTO/LikePostDTO";
 import {DeletePostDTO} from "./DTO/DeletePostDTO";
 import {EditPostDTO} from "./DTO/EditPostDTO";
 
-@Controller()
+@Controller("/post")
 export class PostsController {
     private readonly postsService: PostsService;
 
@@ -17,34 +17,34 @@ export class PostsController {
     }
 
     @HttpCode(200)
-    @Get("/userPosts/login=:login&token=:token")
+    @Get("/login=:login&token=:token")
     public async GetUserPosts(@Param() postsDTO: PostsDTO): Promise<Array<UserPostResponse> | ResponseModel>{
         return await this.postsService.GetUserPosts(postsDTO);
     }
 
     @HttpCode(201)
-    @Post("/post")
+    @Post()
     @UsePipes(ValidationPipe)
     public async CreatePost(@Body() createPostDTO: CreatePostDTO): Promise<boolean | ResponseModel> {
         return await this.postsService.CreatePost(createPostDTO);
     }
 
     @HttpCode(200)
-    @Post("/likePost")
+    @Post("/like")
     @UsePipes(ValidationPipe)
     public async LikePost(@Body() likePostDTO: LikePostDTO): Promise<boolean | ResponseModel> {
         return await this.postsService.LikePost(likePostDTO);
     }
 
     @HttpCode(200)
-    @Delete("/post")
+    @Delete()
     @UsePipes(ValidationPipe)
     public async DeletePost(@Body() deletePostDTO: DeletePostDTO): Promise<boolean | ResponseModel> {
         return await this.postsService.DeletePost(deletePostDTO);
     }
 
     @HttpCode(201)
-    @Patch("/post")
+    @Patch()
     @UsePipes(ValidationPipe)
     public async EditPost(@Body() editPostDTO: EditPostDTO): Promise<boolean | ResponseModel> {
         return await this.postsService.EditPost(editPostDTO);
