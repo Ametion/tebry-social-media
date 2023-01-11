@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, HttpCode, Param, Post, UsePipes, ValidationPipe} from "@nestjs/common";
+import {Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, UsePipes, ValidationPipe} from "@nestjs/common";
 import {PostsService} from "./posts.service";
 import {PostsDTO} from "./DTO/PostsDTO";
 import {UserPostResponse} from "./Response/UserPostResponse";
@@ -6,6 +6,7 @@ import {ResponseModel} from "../Responses/ResponseModel";
 import {CreatePostDTO} from "./DTO/CreatePostDTO";
 import {LikePostDTO} from "./DTO/LikePostDTO";
 import {DeletePostDTO} from "./DTO/DeletePostDTO";
+import {EditPostDTO} from "./DTO/EditPostDTO";
 
 @Controller()
 export class PostsController {
@@ -40,5 +41,12 @@ export class PostsController {
     @UsePipes(ValidationPipe)
     public async DeletePost(@Body() deletePostDTO: DeletePostDTO): Promise<boolean | ResponseModel> {
         return await this.postsService.DeletePost(deletePostDTO);
+    }
+
+    @HttpCode(201)
+    @Patch("/post")
+    @UsePipes(ValidationPipe)
+    public async EditPost(@Body() editPostDTO: EditPostDTO): Promise<boolean | ResponseModel> {
+        return await this.postsService.EditPost(editPostDTO);
     }
 }

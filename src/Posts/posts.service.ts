@@ -10,6 +10,7 @@ import {LikePostDTO} from "./DTO/LikePostDTO";
 import {UserPost} from "../Database/Entities";
 import {CommentResponse} from "../Comments/Response/CommentResponse";
 import {DeletePostDTO} from "./DTO/DeletePostDTO";
+import {EditPostDTO} from "./DTO/EditPostDTO";
 @Injectable()
 export class PostsService{
     private readonly usersService: UsersService;
@@ -141,6 +142,38 @@ export class PostsService{
             })
 
             await post.remove();
+
+            return true;
+        }catch{
+            return new ResponseModel(400, "Something went wrong");
+        }
+    }
+
+    public async EditPost(editPostDTO: EditPostDTO): Promise<boolean | ResponseModel> {
+        try{
+            if(!await this.usersService.IsUserExist(editPostDTO.login)){
+                return new ResponseModel(204, "No user with this login");
+            }
+
+            if(!await this.usersService.CheckToken(editPostDTO.login, editPostDTO.token)){
+                return new ResponseModel(400, "Wrong access token");
+            }
+
+            const post = await PostsRepo.findOneOrFail({
+                where: {
+                    id: editPostDTO.postId
+                }
+            })
+
+            if(editPostDTO.newPostTitle){
+                post.postTitle = editPostDTO.newPostTitle;
+            }
+
+            if(editPostDTO.newPostContent){
+                post.postContent = editPostDTO.newPostContent;
+            }
+
+            await post.save();
 
             return true;
         }catch{
