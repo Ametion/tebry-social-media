@@ -9,6 +9,7 @@ import {CreatePostDTO} from "./DTO/CreatePostDTO";
 import {LikePostDTO} from "./DTO/LikePostDTO";
 import {UserPost} from "../Database/Entities";
 import {CommentResponse} from "../Comments/Response/CommentResponse";
+import {DeletePostDTO} from "./DTO/DeletePostDTO";
 @Injectable()
 export class PostsService{
     private readonly usersService: UsersService;
@@ -118,6 +119,30 @@ export class PostsService{
             await user.save();
 
             return false;
+        }catch{
+            return new ResponseModel(400, "Something went wrong");
+        }
+    }
+
+    public async DeletePost(deletePostDTO: DeletePostDTO): Promise<boolean | ResponseModel> {
+        try{
+            if(!await this.usersService.IsUserExist(deletePostDTO.login)){
+                return new ResponseModel(204, "No user with this login");
+            }
+
+            if(!await this.usersService.CheckToken(deletePostDTO.login, deletePostDTO.token)){
+                return new ResponseModel(400, "Wrong access token");
+            }
+
+            const post = await PostsRepo.findOneOrFail({
+                where: {
+                    id: deletePostDTO.postId
+                }
+            })
+
+            await post.remove();
+
+            return true;
         }catch{
             return new ResponseModel(400, "Something went wrong");
         }

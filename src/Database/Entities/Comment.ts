@@ -15,7 +15,7 @@ export class Comment extends BaseEntity{
     @ManyToOne(() => User, u => u.comments, {nullable: false, onDelete: "CASCADE"})
     author: User;
 
-    @ManyToOne(() => UserPost, post => post.comments, {nullable: false ,onDelete: "CASCADE"})
+    @ManyToOne(() => UserPost, post => post.comments, {nullable: false, onDelete: "CASCADE"})
     @JoinColumn()
     post: UserPost;
 }
