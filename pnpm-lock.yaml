@@ -14,6 +14,7 @@ specifiers:
   '@typescript-eslint/eslint-plugin': ^5.0.0
   '@typescript-eslint/parser': ^5.0.0
   bcrypt: ^5.1.0
+  body-parser: ^1.20.1
   class-transformer: ^0.5.1
   class-validator: ^0.14.0
   dotenv: ^16.0.3
@@ -41,6 +42,7 @@ dependencies:
   '@nestjs/core': 9.2.1_e6la6qvsclaae2becwjnmfvsuq
   '@nestjs/platform-express': 9.2.1_hjcqpoaebdr7gdo5hgc22hthbe
   bcrypt: 5.1.0
+  body-parser: 1.20.1
   class-transformer: 0.5.1
   class-validator: 0.14.0
   dotenv: 16.0.3
