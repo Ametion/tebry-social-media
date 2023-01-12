@@ -1,8 +1,9 @@
-import {Body, Controller, Delete, HttpCode, Post, UsePipes, ValidationPipe} from "@nestjs/common";
+import {Body, Controller, Delete, HttpCode, Patch, Post, UsePipes, ValidationPipe} from "@nestjs/common";
 import {CommentsService} from "./comments.service";
 import {AddCommentDTO} from "./DTO/AddCommentDTO";
 import {ResponseModel} from "../Responses/ResponseModel";
 import {DeleteCommentDTO} from "./DTO/DeleteCommentDTO";
+import {EditCommentDTO} from "./DTO/EditCommentDTO";
 
 @Controller("/comment")
 export class CommentsController{
@@ -24,5 +25,12 @@ export class CommentsController{
     @UsePipes(ValidationPipe)
     public async DeleteComment(@Body() deleteCommentDTO: DeleteCommentDTO): Promise<boolean | ResponseModel> {
         return await this.commentsService.DeleteComment(deleteCommentDTO);
+    }
+
+    @HttpCode(200)
+    @Patch()
+    @UsePipes(ValidationPipe)
+    public async EditComment(@Body() editCommentDTO: EditCommentDTO): Promise<boolean | ResponseModel> {
+        return await this.commentsService.EditComment(editCommentDTO);
     }
 }

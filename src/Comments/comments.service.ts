@@ -4,6 +4,7 @@ import {AddCommentDTO} from "./DTO/AddCommentDTO";
 import {UsersService} from "../Users/users.service";
 import {CommentsRepo} from "../Database/DatabaseRepositories";
 import {DeleteCommentDTO} from "./DTO/DeleteCommentDTO";
+import {EditCommentDTO} from "./DTO/EditCommentDTO";
 
 @Injectable()
 export class CommentsService{
@@ -59,6 +60,36 @@ export class CommentsService{
 
             return true;
         }catch(e: any){
+            return new ResponseModel(400, "Something went wrong");
+        }
+    }
+
+    public async EditComment(editCommentDTO: EditCommentDTO): Promise<boolean | ResponseModel> {
+        try{
+            if(!await this.usersService.IsUserExist(editCommentDTO.login)){
+                return new ResponseModel(204, "No user with this login");
+            }
+
+            if(!await this.usersService.CheckToken(editCommentDTO.login, editCommentDTO.token)){
+                return new ResponseModel(400, "Wrong access token");
+            }
+
+            const comment = await CommentsRepo.findOneOrFail({
+                where: {
+                    id: editCommentDTO.commentId
+                }
+            })
+
+            if(!editCommentDTO.newCommentContent){
+                return false;
+            }
+
+            comment.content = editCommentDTO.newCommentContent;
+
+            await comment.save();
+
+            return true;
+        }catch{
             return new ResponseModel(400, "Something went wrong");
         }
     }
