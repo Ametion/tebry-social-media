@@ -1,5 +1,5 @@
 import {DataSource} from "typeorm";
-import {Comment, User, UserPost} from "./Entities";
+import {Comment, PostImage, User, UserPost} from "./Entities";
 
 require("dotenv").config()
 
@@ -10,6 +10,6 @@ export const databaseConnection = new DataSource({
     username: "root",
     password: "",
     database: process.env.DATABASENAME?.toString() || "",
-    entities: [User, Comment, UserPost],
+    entities: [User, Comment, UserPost, PostImage],
     synchronize: true
 })

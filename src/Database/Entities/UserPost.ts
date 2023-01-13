@@ -10,6 +10,7 @@ import {
 } from "typeorm";
 import {User} from "./User";
 import {Comment} from "./Comment";
+import {PostImage} from "./PostImage";
 
 @Entity("userPosts")
 export class UserPost extends BaseEntity{
@@ -26,6 +27,9 @@ export class UserPost extends BaseEntity{
     })
     postContent: string;
 
+    @CreateDateColumn()
+    createdAt: Date;
+
     @ManyToOne(() => User, user => user.posts)
     @JoinColumn()
     author: User;
@@ -37,6 +41,6 @@ export class UserPost extends BaseEntity{
     @OneToMany(() => Comment, comment => comment.post)
     comments: Comment[];
 
-    @CreateDateColumn()
-    createdAt: Date;
+    @OneToMany(() => PostImage, i => i.post)
+    images: PostImage[];
 }
