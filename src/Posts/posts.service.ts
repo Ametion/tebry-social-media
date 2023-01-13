@@ -2,7 +2,7 @@ import {Injectable} from "@nestjs/common";
 import {PostsDTO} from "./DTO/PostsDTO";
 import {ResponseModel} from "../Responses/ResponseModel";
 import {UserPostResponse} from "./Response/UserPostResponse";
-import {PostsRepo} from "../Database/DatabaseRepositories";
+import {PostImagesRepo, PostsRepo} from "../Database/DatabaseRepositories";
 import {UserResponse} from "../Users/Response/UserResponse";
 import {UsersService} from "../Users/users.service";
 import {CreatePostDTO} from "./DTO/CreatePostDTO";
@@ -11,6 +11,7 @@ import {UserPost} from "../Database/Entities";
 import {CommentResponse} from "../Comments/Response/CommentResponse";
 import {DeletePostDTO} from "./DTO/DeletePostDTO";
 import {EditPostDTO} from "./DTO/EditPostDTO";
+import {ImagesResponse} from "./Response/ImagesResponse";
 @Injectable()
 export class PostsService{
     private readonly usersService: UsersService;
@@ -42,20 +43,31 @@ export class PostsService{
                     comments: {
                         author: true
                     },
-                    author: true
+                    author: true,
                 }
             })
 
-            posts.forEach(p => {
+            for (const p of posts) {
                 const whoLiked = []
                 const comments = []
+                const images = []
+
+                const postImages = await PostImagesRepo.find({
+                    where: {
+                        post: {
+                            id: p.id
+                        }
+                    }
+                })
+
+                postImages.forEach(i => images.push(new ImagesResponse(i.id, i.image)));
 
                 p.likedBy.forEach(u => whoLiked.push(new UserResponse(u.id, u.login, u.firstName, u.secondName)))
                 p.comments.forEach(c => comments.push(new CommentResponse(c.id, c.content, "",
                     new UserResponse(c.author.id, c.author.login, c.author.firstName, c.author.secondName))))
                 arr.push(new UserPostResponse(p.id, p.postTitle, p.postContent,
-                new UserResponse(p.author.id, p.author.login, p.author.firstName, p.author.secondName), whoLiked, comments));
-            });
+                new UserResponse(p.author.id, p.author.login, p.author.firstName, p.author.secondName), whoLiked, comments, images));
+            }
 
             return arr;
         }catch{
@@ -80,6 +92,15 @@ export class PostsService{
             })
 
             await post.save()
+
+            for (const i of createPostDTO.images) {
+                const image = PostImagesRepo.create({
+                    image: i,
+                    post: post
+                });
+
+                await image.save();
+            }
 
             return true;
         }catch{

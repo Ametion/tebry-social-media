@@ -1,4 +1,4 @@
-import {IsNotEmpty, IsString, MaxLength, MinLength} from "class-validator";
+import {ArrayMaxSize, IsArray, IsNotEmpty, IsString, MaxLength, MinLength} from "class-validator";
 
 export class CreatePostDTO {
 
@@ -25,4 +25,8 @@ export class CreatePostDTO {
     @MaxLength(75, {message: "that value its too long to be a token"})
     @MinLength(1, {message: "that value its too short to be a token"})
     public token: string;
+
+    @IsArray({message: "its must to be array"})
+    @ArrayMaxSize(5, {message: "too many images"})
+    public images: string[];
 }
