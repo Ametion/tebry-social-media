@@ -17,7 +17,7 @@ export class PostsController {
     }
 
     @HttpCode(200)
-    @Get("/login=:login&token=:token")
+    @Get("/userLogin=:userLogin&login=:login&token=:token")
     public async GetUserPosts(@Param() postsDTO: PostsDTO): Promise<Array<UserPostResponse> | ResponseModel>{
         return await this.postsService.GetUserPosts(postsDTO);
     }

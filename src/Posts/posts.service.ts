@@ -34,7 +34,7 @@ export class PostsService{
             const posts = await PostsRepo.find({
                 where: {
                     author: {
-                        login: postsDTO.login
+                        login: postsDTO.userLogin
                     }
                 },
                 relations: {
