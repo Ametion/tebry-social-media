@@ -8,7 +8,8 @@ export class PostImage extends BaseEntity{
 
 
     @Column({
-        nullable: false
+        nullable: false,
+        type: "longtext"
     })
     image: string;
 
