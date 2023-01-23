@@ -41,6 +41,6 @@ export class UserPost extends BaseEntity{
     @OneToMany(() => Comment, comment => comment.post)
     comments: Comment[];
 
-    @OneToMany(() => PostImage, i => i.post)
+    @OneToMany(() => PostImage, i => i.post, {cascade: true})
     images: PostImage[];
 }

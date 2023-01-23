@@ -13,6 +13,6 @@ export class PostImage extends BaseEntity{
     })
     image: string;
 
-    @ManyToOne(() => UserPost, p => p.images)
+    @ManyToOne(() => UserPost, p => p.images, {onDelete: "CASCADE"})
     post: UserPost;
 }
